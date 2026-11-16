@@ -1,0 +1,16 @@
+{
+  "name": "tracking-check",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Checker gratuito de tracking y Consent Mode v2 para captar clientes",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test --test-concurrency=1 test/*.test.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "express": "^4.21.2",
+    "playwright": "1.65.1"
+  }
+}

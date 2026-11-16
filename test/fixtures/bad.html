@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><title>bad</title>
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-AAA111"></script>
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-BBB222"></script>
+<script>
+document.cookie = "_ga=GA1.1.123.456; path=/";
+document.cookie = "_fbp=fb.1.123.456; path=/";
+fetch("https://region1.google-analytics.com/g/collect?v=2&tid=G-AAAA1111&en=page_view").catch(()=>{});
+fetch("https://region1.google-analytics.com/g/collect?v=2&tid=G-BBBB2222&en=page_view").catch(()=>{});
+new Image().src = "https://www.facebook.com/tr?id=1&ev=PageView";
+</script></head><body><h1>Shop</h1></body></html>
