@@ -1,10 +1,34 @@
 ---
 import Base from '../layouts/Base.astro';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
-<Base title="Impressum" description="Impressum">
+<Base title="Impressum" description="Impressum und Anbieterkennzeichnung von Tracking-Check, einem Angebot von RichAds Digital Marketing.">
   <section class="page-head narrow">
     <h1>Impressum</h1>
-    {/* PENDIENTE: sustituir por el texto legal real antes de dar a conocer la web */}
-    <p class="muted">[Text folgt]</p>
   </section>
+  <div class="narrow">
+    <h2>Angaben gemäß § 5 DDG</h2>
+    <p>
+      RichAds Digital Marketing<br />
+      Inhaber: Ricard Rodríguez Parra<br />
+      Carrer del Pistó 3<br />
+      08026 Barcelona<br />
+      Spanien
+    </p>
+
+    <h2>Kontakt</h2>
+    <p>
+      E-Mail: <a href="mailto:richadsdigitalmarketing@gmail.com">richadsdigitalmarketing@gmail.com</a><br />
+      Kontaktformular: <a href={`${base}/kontakt/`}>Anfrage senden</a>
+    </p>
+
+    <h2>Umsatzsteuer-ID</h2>
+    <p>Umsatzsteuer-Identifikationsnummer: ES46720960W</p>
+
+    <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+    <p>Ricard Rodríguez Parra, Anschrift wie oben</p>
+
+    <h2>Verbraucherstreitbeilegung</h2>
+    <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+  </div>
 </Base>
