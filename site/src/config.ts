@@ -5,7 +5,7 @@ export const OWNER = 'Ricard';
 export const CONTACT_EMAIL = 'info@richadsdigitalmarketing.com';
 
 // URL del analizador en Cloud Run (sin barra final). Vacío = modo demo.
-export const API_URL = '';
+export const API_URL = 'https://tracking-check-1065360973123.europe-west1.run.app';
 
 // Precios: deja price en null para mostrar "Festpreis nach kurzer Prüfung".
 // Ejemplo con precio: price: 'ab 290 €'
