@@ -12,13 +12,13 @@ function doPost(e) {
   }
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Fecha', 'Origen', 'Nombre', 'Email', 'Teléfono', 'Empresa', 'Mensaje', 'URL', 'Semáforo', 'Resumen', 'Problemas', 'GTM', 'GA4', 'Google Ads', 'CMP']);
+    sheet.appendRow(['Fecha', 'Origen', 'Nombre', 'Email', 'Teléfono', 'Empresa', 'Mensaje', 'URL', 'Semáforo', 'Resumen', 'Problemas', 'GTM', 'GA4', 'Google Ads', 'CMP', 'Eventos']);
   }
   const f = data.facts || { ids: {} };
   const ids = f.ids || {};
   sheet.appendRow([
     data.receivedAt, data.source, data.name, data.email, data.phone, data.company, data.message, data.url, data.level, data.headline, data.problems,
-    (ids.gtm || []).join(', '), (ids.ga4 || []).join(', '), (ids.ads || []).join(', '), (f.cmps || []).join(', '),
+    (ids.gtm || []).join(', '), (ids.ga4 || []).join(', '), (ids.ads || []).join(', '), (f.cmps || []).join(', '), (f.events || []).join(' | '),
   ]);
   MailApp.sendEmail({
     to: NOTIFY_EMAIL,
@@ -28,7 +28,8 @@ function doPost(e) {
       '\nURL: ' + data.url + '\nSemáforo: ' + data.level + ' (' + data.headline + ')' +
       '\nProblemas: ' + data.problems +
       '\nGTM: ' + (ids.gtm || []).join(', ') + '\nGA4: ' + (ids.ga4 || []).join(', ') +
-      '\nGoogle Ads: ' + (ids.ads || []).join(', ') + '\nCMP: ' + (f.cmps || []).join(', '),
+      '\nGoogle Ads: ' + (ids.ads || []).join(', ') + '\nCMP: ' + (f.cmps || []).join(', ') +
+      '\nEventos:\n' + (f.events || []).join('\n'),
   });
   return ContentService.createTextOutput('ok');
 }

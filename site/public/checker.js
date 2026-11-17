@@ -3,11 +3,13 @@
   if (!$('scanForm')) return;
   var API = (window.CC_API || '').replace(/\/$/, '');
   var DEMO = !API;
-  var DEMO_RESULT = { scanId: null, level: 'red', headline: '3 kritische Probleme gefunden', checks: [
+  var DEMO_RESULT = { scanId: null, level: 'red', headline: '4 kritische Probleme gefunden', checks: [
     { status: 'ok', title: 'Cookie-Banner erkannt: Borlabs Cookie', detail: 'Ein Consent-Management-Tool ist auf der Seite eingebunden.' },
     { status: 'warn', title: '2 Google-Tag-Manager-Container gleichzeitig geladen', detail: 'Mehrere Container auf derselben Seite sind eine häufige Ursache für doppelt gezählte Daten.' },
     { status: 'ok', title: 'Google Analytics 4 erkannt', detail: 'Eine GA4-Property empfängt Daten.' },
     { status: 'ok', title: 'Google-Ads-Tag erkannt', detail: 'Ein Google-Ads-Tag ist auf dieser Seite aktiv.' },
+    { status: 'warn', title: 'Google Ads ohne eigene Conversion im Tag Manager', detail: 'Google Ads ist eingebunden, aber im Tag Manager ist keine Conversion eingerichtet. Conversions könnten auch aus GA4 importiert sein.' },
+    { status: 'fail', title: 'Formular ohne erkennbares Tracking', detail: 'Auf der geprüften Seite gibt es ein Formular. Im Tag Manager ist kein Ereignis für den Versand eines Formulars, eine Danke-Seite oder eine Erfolgsmeldung eingerichtet.' },
     { status: 'fail', title: 'Consent Mode v2 nicht erkannt', detail: 'Die Daten an Google enthalten keine Einwilligungssignale.' },
     { status: 'fail', title: 'Google-Tags senden Daten vor der Einwilligung', detail: 'Bevor der Besucher etwas angeklickt hat, gehen bereits Daten an Google, ohne Einwilligungssignal.' },
     { status: 'fail', title: 'Tracking-Cookies vor der Einwilligung gesetzt', detail: 'Ohne Zustimmung gesetzt: _ga (Google Analytics), _gcl_au (Google Ads).' }

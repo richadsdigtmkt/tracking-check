@@ -13,9 +13,11 @@ let fixtureSrv, appSrv, fixtureBase, appBase;
 
 test.before(async () => {
   fixtureSrv = http.createServer((req, res) => {
-    const f = path.join(__dirname, 'fixtures', path.basename(req.url.split('?')[0]));
+    const id = (req.url.match(/id=(GTM-[A-Z0-9]+)/) || [])[1];
+    const name = id === 'GTM-EMPTY1' ? 'gtm-empty.js' : path.basename(req.url.split('?')[0]);
+    const f = path.join(__dirname, 'fixtures', name);
     if (!fs.existsSync(f)) { res.writeHead(404); return res.end(); }
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, { 'Content-Type': f.endsWith('.js') ? 'text/javascript' : 'text/html' });
     res.end(fs.readFileSync(f));
   });
   await new Promise((r) => fixtureSrv.listen(0, '127.0.0.1', r));
@@ -63,6 +65,18 @@ test('acepta banner desconocido por texto', { timeout: 90000 }, async () => {
   const { body } = await scanVia(fixtureBase + '/textbanner.html');
   assert.ok(!byId(body, 'post'), 'no debería quedar el aviso de banner sin confirmar');
   assert.strictEqual(byId(body, 'cmv2').status, 'ok');
+});
+
+test('lee eventos del contenedor y detecta formulario', { timeout: 90000 }, async () => {
+  const { body } = await scanVia(fixtureBase + '/events.html');
+  assert.strictEqual(byId(body, 'leads').status, 'ok', JSON.stringify(body.checks));
+  assert.strictEqual(byId(body, 'ads_conv').status, 'ok');
+  assert.match(byId(body, 'leads').detail, /ein Formular/);
+});
+
+test('formulario sin eventos sale crítico', { timeout: 90000 }, async () => {
+  const { body } = await scanVia(fixtureBase + '/noevents.html');
+  assert.strictEqual(byId(body, 'leads').status, 'fail', JSON.stringify(body.checks));
 });
 
 test('lead se acepta y el honeypot no rompe', async () => {

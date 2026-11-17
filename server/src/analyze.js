@@ -2,6 +2,7 @@
 // Solo describe síntomas: el porqué y la solución quedan para el informe de pago.
 
 const { CMPS, TRACKERS, GOOGLE_HIT, TRACKING_COOKIES } = require('./signatures');
+const { parseContainer, parseInlineGtag } = require('./container');
 
 function param(u, key) {
   try {
@@ -21,7 +22,7 @@ function collectIds(allRequests) {
   const ads = new Set();
   for (const u of allRequests) {
     let m;
-    if ((m = u.match(/googletagmanager\.com\/gtm\.js\?(?:[^#]*&)?id=(GTM-[A-Z0-9]+)/i))) gtm.add(m[1].toUpperCase());
+    if ((m = u.match(/\/gtm\.js\?(?:[^#]*&)?id=(GTM-[A-Z0-9]+)/i))) gtm.add(m[1].toUpperCase());
     if ((m = u.match(/\/gtag\/js\?(?:[^#]*&)?id=((?:G|AW|GT|DC)-[A-Z0-9]+)/i))) {
       const id = m[1].toUpperCase();
       if (id.startsWith('G-')) ga4.add(id);
@@ -129,6 +130,52 @@ function analyze(scan) {
     add('ads', 'info', 'Kein Google-Ads-Tag auf dieser Seite', 'Falls Sie Google Ads schalten, wird auf dieser Seite nichts an Google Ads gemeldet.');
   }
 
+  // 4b. Eventos y conversiones (leídos del contenedor de GTM, sin enviar nada)
+  const events = [];
+  let containersRead = 0;
+  for (const c of scan.containers || []) {
+    const parsed = parseContainer(c.text || '');
+    if (!parsed) continue;
+    containersRead++;
+    events.push(...parsed.events);
+  }
+  if (scan.page && scan.page.inline) events.push(...parseInlineGtag(scan.page.inline));
+  const adsConv = events.filter((e) => e.platform === 'Google Ads' && e.kind === 'conversion');
+  const ga4Events = events.filter((e) => e.platform === 'GA4');
+  const LEAD_TRIGGER = new Set(['form', 'form_event', 'thankyou', 'visibility']);
+  const LEAD_NAME = /lead|form|kontakt|contact|anfrage|termin|booking|buchung|gebucht|submit|newsletter|sign_up|signup|purchase|kauf|bestellung|anruf|call/i;
+  const leadEvents = events.filter((e) => e.triggers.some((t) => LEAD_TRIGGER.has(t.type)) || (e.platform !== 'Google Ads' && LEAD_NAME.test(e.name)));
+  const triggerLabels = (list) => [...new Set(list.flatMap((e) => e.triggers.map((t) => t.label)))].join(', ');
+  const formsOnPage = scan.page ? scan.page.forms : 0;
+  const canReadEvents = containersRead > 0 || events.length > 0;
+  const hasAdsTag = ids.ads.length > 0 || adsConv.length > 0;
+
+  if (hasAdsTag) {
+    if (adsConv.length) {
+      add('ads_conv', 'ok', `${adsConv.length} Google-Ads-Conversion${adsConv.length === 1 ? '' : 's'} eingerichtet`, `Ausgelöst durch: ${triggerLabels(adsConv)}.`);
+    } else if (canReadEvents) {
+      add('ads_conv', 'warn', 'Google Ads ohne eigene Conversion im Tag Manager', 'Google Ads ist eingebunden, aber im Tag Manager ist keine Conversion eingerichtet. Conversions könnten auch aus GA4 importiert sein.');
+    }
+  }
+  if (canReadEvents && (ids.ga4.length || ga4Events.length)) {
+    if (ga4Events.length) {
+      const names = [...new Set(ga4Events.map((e) => e.name))];
+      add('ga4_events', 'ok', `GA4-Ereignisse eingerichtet: ${names.slice(0, 4).join(', ')}${names.length > 4 ? ` und ${names.length - 4} weitere` : ''}`, `Ausgelöst durch: ${triggerLabels(ga4Events)}.`);
+    } else {
+      add('ga4_events', 'warn', 'GA4 erfasst keine eigenen Ereignisse', 'Im Tag Manager sind keine Ereignisse wie Anfragen, Buchungen oder Käufe eingerichtet. Automatisch erfasste Ereignisse der erweiterten Messung sind hier nicht sichtbar.');
+    }
+  }
+  if (canReadEvents) {
+    const where = formsOnPage ? `Auf der geprüften Seite gibt es ${formsOnPage === 1 ? 'ein Formular' : formsOnPage + ' Formulare'}. ` : '';
+    if (leadEvents.length) {
+      add('leads', 'ok', 'Anfragen bzw. Formulare werden erfasst', `${where}Es gibt Ereignisse für: ${triggerLabels(leadEvents)}.`);
+    } else {
+      add('leads', formsOnPage ? 'fail' : 'warn', formsOnPage ? 'Formular ohne erkennbares Tracking' : 'Kein Tracking für Anfragen erkennbar', `${where}Im Tag Manager ist kein Ereignis für den Versand eines Formulars, eine Danke-Seite oder eine Erfolgsmeldung eingerichtet.`);
+    }
+  } else if (ids.gtm.length) {
+    add('leads', 'info', 'Ereignisse konnten nicht gelesen werden', 'Der Tag-Manager-Container wurde vor oder nach der Einwilligung nicht geladen.');
+  }
+
   // 5. Consent Mode v2
   if (!hasGoogle) {
     add('cmv2', 'info', 'Consent Mode: nicht relevant', 'Auf der Seite wurden keine Google-Tags gefunden.');
@@ -207,7 +254,7 @@ function analyze(scan) {
     level,
     headline,
     checks,
-    facts: { ids, cmps, preHits: preHits.length, postHits: postHits.length, acceptClicked: !!scan.acceptClicked, consentDefault: !!scan.consentDefault },
+    facts: { ids, cmps, preHits: preHits.length, postHits: postHits.length, acceptClicked: !!scan.acceptClicked, consentDefault: !!scan.consentDefault, formsOnPage, events: events.map((e) => `${e.platform}: ${e.name} (${e.triggers.map((t) => t.label + (t.value ? ' ' + t.value : '')).join(', ')})`) },
   };
 }
 

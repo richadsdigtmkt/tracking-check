@@ -76,6 +76,16 @@ async function scan(targetUrl, { timeoutMs = 25000 } = {}) {
     if (list.length < 3000) list.push(req.url());
   });
 
+  // Guarda el contenido de los contenedores de GTM para analizar eventos y conversiones
+  const containerBodies = [];
+  const bodyPromises = [];
+  context.on('response', (resp) => {
+    const u = resp.url();
+    if (/\/gtm\.js\?(?:[^#]*&)?id=GTM-/i.test(u) && containerBodies.length < 4) {
+      bodyPromises.push(resp.text().then((t) => containerBodies.push({ url: u, text: t })).catch(() => {}));
+    }
+  });
+
   await context.route('**/*', (route) => {
     const req = route.request();
     let host = '';
@@ -118,6 +128,18 @@ async function scan(targetUrl, { timeoutMs = 25000 } = {}) {
       })
       .catch(() => false);
 
+    result.page = await page
+      .evaluate(() => {
+        const forms = [...document.querySelectorAll('form')].filter((f) => {
+          if (f.getAttribute('role') === 'search' || f.querySelector('input[type=search], input[name=s], input[name=q]')) return false;
+          return !!f.querySelector('input[type=email], input[type=tel], textarea');
+        });
+        const inline = [...document.querySelectorAll('script:not([src])')].map((s) => s.textContent).join('\n').slice(0, 300000);
+        const forms3p = !!document.querySelector('iframe[src*="calendly"], iframe[src*="hubspot"], iframe[src*="typeform"], iframe[src*="jotform"], iframe[src*="oncehub"]');
+        return { forms: forms.length, embeddedForms: forms3p, inline };
+      })
+      .catch(() => ({ forms: 0, embeddedForms: false, inline: '' }));
+
     result.pre = { requests: requests.pre.slice(), cookies: (await context.cookies()).map((c) => ({ name: c.name, domain: c.domain })) };
 
     phase = 'post';
@@ -128,6 +150,8 @@ async function scan(targetUrl, { timeoutMs = 25000 } = {}) {
       await settle(page, 6000, 3000);
     }
     result.post = { requests: requests.post.slice(), cookies: (await context.cookies()).map((c) => ({ name: c.name, domain: c.domain })) };
+    await Promise.race([Promise.all(bodyPromises), sleep(5000)]);
+    result.containers = containerBodies;
   } finally {
     await context.close().catch(() => {});
   }

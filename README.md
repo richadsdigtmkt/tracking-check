@@ -72,6 +72,8 @@ Cada lead y cada escaneo queda además en los logs de Cloud Run.
 
 ## Qué comprueba el checker
 
-Banner/CMP (unos 20 proveedores), GTM y GA4 duplicados, tag de Google Ads, Consent Mode v2 (`gcs`/`gcd`), datos a Google antes del consentimiento, cookies y píxeles antes del consentimiento, y el comportamiento después de pulsar "aceptar todo".
+Banner/CMP (unos 20 proveedores), GTM y GA4 duplicados, tag de Google Ads, eventos y conversiones montados en GTM y qué los activa (envío de formulario, página de gracias, clic, eventos de plugins como Contact Form 7), si la página tiene formulario y si hay algo que lo registre, Consent Mode v2 (`gcs`/`gcd`), datos a Google antes del consentimiento, cookies y píxeles antes del consentimiento, y el comportamiento después de pulsar "aceptar todo".
+
+Los eventos se leen del contenedor público de GTM (gtm.js): nunca se envía un formulario de la web analizada, para no generar leads ni conversiones falsas. Por eso no puede confirmar que el evento llegue de verdad al enviar, solo que está montado.
 
 Limitaciones: analiza solo la URL introducida, webs con anti-bots estricto pueden bloquearlo, y el server-side tagging con dominio propio se detecta solo en parte.
