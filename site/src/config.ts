@@ -2,7 +2,7 @@
 
 export const BRAND = 'Tracking-Check';
 export const OWNER = 'Ricard';
-export const CONTACT_EMAIL = 'info@richadsdigitalmarketing.com';
+export const CONTACT_EMAIL = 'richadsdigitalmarketing@gmail.com';
 
 // URL del analizador en Cloud Run (sin barra final). Vacío = modo demo.
 export const API_URL = 'https://tracking-check-1065360973123.europe-west1.run.app';

@@ -1,35 +1,42 @@
-// Recibe los leads del Tracking-Check, los guarda en la hoja activa y te avisa por email.
-// Configuración: Extensiones > Apps Script en una Google Sheet nueva, pega este código,
-// cambia SECRET y NOTIFY_EMAIL, y despliega como "Aplicación web" (acceso: cualquier usuario).
+// Recibe los leads de Tracking-Check, los guarda en la hoja "Tracking-Check Leads"
+// y avisa por email. Se publica como aplicación web (ejecutar como: yo, acceso: cualquier usuario).
+// El secreto debe coincidir con la variable LEAD_WEBHOOK_SECRET del servidor de Cloud Run.
 
-const SECRET = 'CAMBIA-ESTE-SECRETO';
-const NOTIFY_EMAIL = 'tu-email@ejemplo.com';
+const SECRET = 'PON-AQUI-EL-SECRETO';
+const SHEET_ID = '1ceDpJRalYRtZmpVkMZo7mefiYXX5-UpqVApDpjlL2As';
+const NOTIFY_EMAIL = 'richadsdigitalmarketing@gmail.com';
 
 function doPost(e) {
-  const data = JSON.parse(e.postData.contents || '{}');
-  if (data.secret !== SECRET) {
-    return ContentService.createTextOutput('forbidden');
-  }
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Fecha', 'Origen', 'Nombre', 'Email', 'Teléfono', 'Empresa', 'Mensaje', 'URL', 'Semáforo', 'Resumen', 'Problemas', 'GTM', 'GA4', 'Google Ads', 'CMP', 'Eventos']);
-  }
-  const f = data.facts || { ids: {} };
+  const data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+  if (data.secret !== SECRET) return ContentService.createTextOutput('forbidden');
+
+  const f = data.facts || {};
   const ids = f.ids || {};
-  sheet.appendRow([
-    data.receivedAt, data.source, data.name, data.email, data.phone, data.company, data.message, data.url, data.level, data.headline, data.problems,
-    (ids.gtm || []).join(', '), (ids.ga4 || []).join(', '), (ids.ads || []).join(', '), (f.cmps || []).join(', '), (f.events || []).join(' | '),
+  const list = (a) => (a || []).join(', ');
+  SpreadsheetApp.openById(SHEET_ID).getSheets()[0].appendRow([
+    data.receivedAt, data.source, data.name, data.email, data.phone, data.company, data.message, data.url,
+    data.level, data.headline, data.problems, list(ids.gtm), list(ids.ga4), list(ids.ads), list(f.cmps), (f.events || []).join(' | '),
   ]);
+
+  const lines = [
+    'Origen: ' + (data.source === 'kontakt' ? 'Formulario de contacto' : 'Checker'),
+    'Nombre: ' + (data.name || ''),
+    'Email: ' + (data.email || ''),
+    'Teléfono: ' + (data.phone || ''),
+    'Empresa: ' + (data.company || ''),
+    'Web: ' + (data.url || ''),
+  ];
+  if (data.message) lines.push('', 'Mensaje:', data.message);
+  if (data.level) {
+    lines.push('', 'Resultado del checker: ' + data.level + ' (' + data.headline + ')', 'Problemas: ' + (data.problems || 'ninguno'),
+      'GTM: ' + list(ids.gtm), 'GA4: ' + list(ids.ga4), 'Google Ads: ' + list(ids.ads), 'CMP: ' + list(f.cmps),
+      'Eventos:', (f.events || []).join('\n'));
+  }
   MailApp.sendEmail({
     to: NOTIFY_EMAIL,
-    subject: 'Nuevo lead (' + data.source + '): ' + (data.url || data.email),
-    body:
-      'Origen: ' + data.source + '\nNombre: ' + data.name + '\nEmpresa: ' + data.company + '\nMensaje: ' + data.message + '\nEmail: ' + data.email + '\nTeléfono: ' + data.phone +
-      '\nURL: ' + data.url + '\nSemáforo: ' + data.level + ' (' + data.headline + ')' +
-      '\nProblemas: ' + data.problems +
-      '\nGTM: ' + (ids.gtm || []).join(', ') + '\nGA4: ' + (ids.ga4 || []).join(', ') +
-      '\nGoogle Ads: ' + (ids.ads || []).join(', ') + '\nCMP: ' + (f.cmps || []).join(', ') +
-      '\nEventos:\n' + (f.events || []).join('\n'),
+    replyTo: data.email || NOTIFY_EMAIL,
+    subject: (data.source === 'kontakt' ? 'Nueva consulta: ' : 'Nuevo lead del checker: ') + (data.url || data.company || data.email),
+    body: lines.join('\n'),
   });
   return ContentService.createTextOutput('ok');
 }

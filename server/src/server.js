@@ -122,7 +122,8 @@ app.post('/api/lead', async (req, res) => {
     problems: stored ? stored.data.report.checks.filter((c) => c.status === 'fail' || c.status === 'warn').map((c) => c.title).join(' | ') : '',
     facts: stored ? stored.data.report.facts : null,
   };
-  console.log(JSON.stringify({ type: 'lead', ...lead }));
+  // Sin datos personales en los logs: solo que ha llegado un lead
+  console.log(JSON.stringify({ type: 'lead', source: lead.source, url: lead.url, level: lead.level, webhook: !!LEAD_WEBHOOK_URL }));
 
   if (LEAD_WEBHOOK_URL) {
     try {
