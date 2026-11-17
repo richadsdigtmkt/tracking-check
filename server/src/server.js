@@ -141,10 +141,10 @@ app.post('/api/lead', async (req, res) => {
 });
 
 app.get('/healthz', (_req, res) => res.send('ok'));
-app.get('/', (_req, res) => res.type('text').send('Consent-Check API'));
+app.get('/', (_req, res) => res.type('text').send('Tracking-Check API'));
 
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`Consent-Check läuft auf Port ${PORT}`));
+  app.listen(PORT, () => console.log(`Tracking-Check läuft auf Port ${PORT}`));
 }
 
 module.exports = { app };

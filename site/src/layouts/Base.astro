@@ -43,7 +43,7 @@ const fullTitle = path === '/' ? title : `${title} | ${BRAND}`;
 <body>
   <header class="site-header">
     <div class="wrap">
-      <a class="logo" href={u('/')}>Consent<span>-Check</span></a>
+      <a class="logo" href={u('/')}>Tracking<span>-Check</span></a>
       <nav class="nav" aria-label="Hauptnavigation">
         {nav.map((n) => (
           <a href={u(n.href)} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a>

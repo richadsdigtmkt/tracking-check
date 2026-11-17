@@ -1,4 +1,4 @@
-# Consent-Check
+# Tracking-Check
 
 Web del servicio de tracking (en alemán) con checker gratuito de Consent Mode v2 y blog.
 
@@ -56,7 +56,7 @@ Desplegar desde GitHub: crea en el repo los secretos `GCP_PROJECT` y `GCP_SA_KEY
 Desplegar a mano:
 
 ```
-gcloud run deploy consent-check --source server --region europe-west1 --allow-unauthenticated --memory 2Gi --cpu 2 --concurrency 2 --timeout 120 --max-instances 3 --update-env-vars MAX_CONCURRENT=2,SCANS_PER_HOUR=10,ALLOWED_ORIGINS=https://richadsdigtmkt.github.io
+gcloud run deploy tracking-check --source server --region europe-west1 --allow-unauthenticated --memory 2Gi --cpu 2 --concurrency 2 --timeout 120 --max-instances 3 --update-env-vars MAX_CONCURRENT=2,SCANS_PER_HOUR=10,ALLOWED_ORIGINS=https://richadsdigtmkt.github.io
 ```
 
 `ALLOWED_ORIGINS` tiene que incluir el dominio desde el que se sirve la web (separados por comas). Pon también una alerta de presupuesto en Google Cloud.

@@ -1,6 +1,6 @@
 // Datos editables de la web. Cambia aquí marca, contacto, API y precios.
 
-export const BRAND = 'Consent-Check';
+export const BRAND = 'Tracking-Check';
 export const OWNER = 'Ricard';
 export const CONTACT_EMAIL = 'info@richadsdigitalmarketing.com';
 

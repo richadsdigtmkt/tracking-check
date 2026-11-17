@@ -15,7 +15,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
       - uses: google-github-actions/setup-gcloud@v2
       - run: |
-          gcloud run deploy consent-check --source server --project "${{ secrets.GCP_PROJECT }}" \
+          gcloud run deploy tracking-check --source server --project "${{ secrets.GCP_PROJECT }}" \
             --region europe-west1 --allow-unauthenticated --memory 2Gi --cpu 2 \
             --concurrency 2 --timeout 120 --max-instances 3 \
             --update-env-vars MAX_CONCURRENT=2,SCANS_PER_HOUR=10,ALLOWED_ORIGINS=https://richadsdigtmkt.github.io

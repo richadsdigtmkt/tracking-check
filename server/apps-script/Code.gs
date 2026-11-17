@@ -1,4 +1,4 @@
-// Recibe los leads del Consent-Check, los guarda en la hoja activa y te avisa por email.
+// Recibe los leads del Tracking-Check, los guarda en la hoja activa y te avisa por email.
 // Configuración: Extensiones > Apps Script en una Google Sheet nueva, pega este código,
 // cambia SECRET y NOTIFY_EMAIL, y despliega como "Aplicación web" (acceso: cualquier usuario).
 
