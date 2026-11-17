@@ -48,6 +48,9 @@
       setTimeout(function () {
         stopSteps(); show('loading', false); $('scanBtn').disabled = false;
         render(Object.assign({}, DEMO_RESULT, { url: url })); show('demoNote', true);
+        $('headline').textContent = 'Beispielergebnis (Demo)';
+        $('checkedUrl').textContent = 'Kein Ergebnis für ' + url + '. Die echte Prüfung ist noch nicht aktiv.';
+        $('light').className = 'light yellow';
       }, 7000);
       return;
     }

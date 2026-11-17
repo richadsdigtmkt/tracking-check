@@ -21,6 +21,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   </ul>
 </section>
 
+<div class="card demo-note" id="demoNote"><strong>Demo-Version:</strong> Die echte Prüfung ist noch nicht aktiv. Unten sehen Sie ein Beispielergebnis, das nichts mit der eingegebenen Website zu tun hat.</div>
+
 <section class="card checker-result" id="result">
   <div class="verdict">
     <div class="light" id="light"></div>
@@ -50,7 +52,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   <p class="small muted" style="margin:16px 0 0">Oder direkt ansehen: <a href={`${base}/preise/`}>Pakete und Preise</a> · <a href={`${base}/ablauf/`}>So läuft die Zusammenarbeit</a></p>
 </section>
 
-<div class="card demo-note" id="demoNote"><strong>Demo-Version:</strong> Diese Vorschau zeigt ein Beispielergebnis. Die echte Prüfung läuft, sobald der Server verbunden ist.</div>
 
 <script is:inline define:vars={{ apiUrl: API_URL }}>window.CC_API = apiUrl;</script>
 <script is:inline src={`${base}/checker.js`}></script>
