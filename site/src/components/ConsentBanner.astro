@@ -1,0 +1,95 @@
+---
+// Banner de cookies propio, con la misma importancia para aceptar y rechazar.
+// Estadística = GA4 y Microsoft Clarity (analytics_storage).
+// Marketing = Google Ads y Meta (ad_storage, ad_user_data, ad_personalization).
+import { GTM_ID } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+{GTM_ID && (
+  <div class="cb" id="cookieBanner" role="dialog" aria-modal="false" aria-labelledby="cbTitle" hidden>
+    <div class="cb-box">
+      <strong id="cbTitle">Cookies und Messung</strong>
+      <p>Mit Ihrer Zustimmung nutze ich Google Analytics und Microsoft Clarity, um die Website zu verbessern, sowie Google Ads und Meta, um meine Werbung zu messen. Sie können Ihre Auswahl jederzeit über „Cookie-Einstellungen“ im Fußbereich ändern. Mehr in der <a href={`${base}/datenschutz/`}>Datenschutzerklärung</a>.</p>
+      <div class="cb-details" id="cbDetails" hidden>
+        <label><input type="checkbox" checked disabled /> <span><b>Notwendig</b>: Speicherung Ihrer Auswahl. Immer aktiv.</span></label>
+        <label><input type="checkbox" id="cbStats" /> <span><b>Statistik</b>: Google Analytics 4, Microsoft Clarity</span></label>
+        <label><input type="checkbox" id="cbMarketing" /> <span><b>Marketing</b>: Google Ads, Meta Pixel</span></label>
+      </div>
+      <div class="cb-actions">
+        <button type="button" class="btn" id="cbAccept">Alle akzeptieren</button>
+        <button type="button" class="btn" id="cbReject">Nur notwendige</button>
+        <button type="button" class="btn ghost" id="cbSettings">Einstellungen</button>
+        <button type="button" class="btn ghost" id="cbSave" hidden>Auswahl speichern</button>
+      </div>
+    </div>
+  </div>
+)}
+
+{GTM_ID && (
+  <script is:inline>
+    (function () {
+      var KEY = 'tc_consent';
+      var el = document.getElementById('cookieBanner');
+      if (!el) return;
+      var $ = function (id) { return document.getElementById(id); };
+      function read() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+      function clearTracking() {
+        var host = location.hostname.split('.');
+        document.cookie.split(';').forEach(function (c) {
+          var name = c.split('=')[0].trim();
+          if (!/^(_ga|_gid|_gcl|_fbp|_fbc|_clck|_clsk|_uet)/.test(name)) return;
+          for (var i = 0; i < host.length - 1; i++) {
+            var dom = host.slice(i).join('.');
+            document.cookie = name + '=; Max-Age=0; path=/; domain=' + dom;
+          }
+          document.cookie = name + '=; Max-Age=0; path=/';
+        });
+      }
+      function save(s, m) {
+        var prev = read();
+        try { localStorage.setItem(KEY, JSON.stringify({ v: 1, s: !!s, m: !!m, t: new Date().toISOString() })); } catch (e) {}
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('consent', 'update', {
+          analytics_storage: s ? 'granted' : 'denied',
+          ad_storage: m ? 'granted' : 'denied',
+          ad_user_data: m ? 'granted' : 'denied',
+          ad_personalization: m ? 'granted' : 'denied',
+        });
+        dataLayer.push({ event: 'consent_update', consent_statistics: !!s, consent_marketing: !!m });
+        if (prev && ((prev.s && !s) || (prev.m && !m))) clearTracking();
+        el.hidden = true;
+      }
+      function open(showDetails) {
+        var c = read();
+        $('cbStats').checked = !!(c && c.s);
+        $('cbMarketing').checked = !!(c && c.m);
+        $('cbDetails').hidden = !showDetails;
+        $('cbSave').hidden = !showDetails;
+        $('cbSettings').hidden = !!showDetails;
+        el.hidden = false;
+      }
+      $('cbAccept').addEventListener('click', function () { save(true, true); });
+      $('cbReject').addEventListener('click', function () { save(false, false); });
+      $('cbSettings').addEventListener('click', function () { open(true); });
+      $('cbSave').addEventListener('click', function () { save($('cbStats').checked, $('cbMarketing').checked); });
+      document.querySelectorAll('[data-cookie-settings]').forEach(function (b) {
+        b.addEventListener('click', function (e) { e.preventDefault(); open(true); });
+      });
+      if (!read()) open(false);
+    })();
+  </script>
+)}
+
+<style>
+  .cb { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 50; display: flex; justify-content: center; }
+  .cb[hidden] { display: none; }
+  .cb-box { background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 40px rgba(20,33,61,.18); padding: 20px 22px; max-width: 760px; width: 100%; }
+  .cb-box p { margin: 6px 0 12px; font-size: 15px; color: var(--muted); }
+  .cb-details { display: grid; gap: 8px; margin: 0 0 14px; font-size: 15px; }
+  .cb-details[hidden] { display: none; }
+  .cb-details label { display: flex; gap: 8px; align-items: flex-start; }
+  .cb-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cb-actions .btn { font-size: 15px; padding: 11px 18px; }
+  .cb-actions [hidden] { display: none; }
+</style>

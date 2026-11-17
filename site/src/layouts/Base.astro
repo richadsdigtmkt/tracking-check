@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
-import { BRAND, OWNER } from '../config';
+import { BRAND, OWNER, GTM_ID } from '../config';
+import ConsentHead from '../components/ConsentHead.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 
 interface Props {
   title: string;
@@ -26,6 +28,7 @@ const fullTitle = path === '/' ? title : `${title} | ${BRAND}`;
 <html lang="de">
 <head>
   <meta charset="utf-8" />
+  <ConsentHead />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
@@ -62,8 +65,10 @@ const fullTitle = path === '/' ? title : `${title} | ${BRAND}`;
         <a href={u('/kontakt/')}>Kontakt</a>
         <a href={u('/impressum/')}>Impressum</a>
         <a href={u('/datenschutz/')}>Datenschutz</a>
+        {GTM_ID && <a href="#" data-cookie-settings>Cookie-Einstellungen</a>}
       </div>
     </div>
   </footer>
+  <ConsentBanner />
 </body>
 </html>

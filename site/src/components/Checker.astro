@@ -1,12 +1,12 @@
 ---
-import { API_URL } from '../config';
+import { API_URL, GTM_ID } from '../config';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <form class="scan" id="scanForm" novalidate>
   <input type="text" id="url" name="url" placeholder="ihre-website.de" autocomplete="url" inputmode="url" aria-label="Website-Adresse" required />
   <button type="submit" class="btn" id="scanBtn">Jetzt prüfen</button>
 </form>
-<div class="small muted" style="margin-top:10px">Kostenlos, ohne Anmeldung. Diese Seite setzt keine Cookies.</div>
+<div class="small muted" style="margin-top:10px">{GTM_ID ? 'Kostenlos und ohne Anmeldung.' : 'Kostenlos, ohne Anmeldung. Diese Seite setzt keine Cookies.'}</div>
 <div class="error" id="scanError"></div>
 
 <section class="card checker-loading" id="loading">

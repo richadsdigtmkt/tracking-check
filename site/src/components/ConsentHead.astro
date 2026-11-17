@@ -1,0 +1,45 @@
+---
+// Consent Mode v2 + Google Tag Manager. Se incluye en <head> solo si hay GTM_ID.
+// Por defecto todo denegado; si el visitante ya eligió, se aplica su elección antes de cargar GTM.
+import { GTM_ID } from '../config';
+---
+{GTM_ID && (
+  <>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        functionality_storage: 'granted',
+        security_storage: 'granted',
+        wait_for_update: 500,
+      });
+      gtag('set', 'ads_data_redaction', true);
+      try {
+        var c = JSON.parse(localStorage.getItem('tc_consent') || 'null');
+        if (c && c.v === 1) {
+          gtag('consent', 'update', {
+            analytics_storage: c.s ? 'granted' : 'denied',
+            ad_storage: c.m ? 'granted' : 'denied',
+            ad_user_data: c.m ? 'granted' : 'denied',
+            ad_personalization: c.m ? 'granted' : 'denied',
+          });
+          dataLayer.push({ event: 'consent_ready', consent_statistics: !!c.s, consent_marketing: !!c.m });
+        }
+      } catch (e) {}
+    </script>
+    <script is:inline define:vars={{ id: GTM_ID }}>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0], j = d.createElement(s);
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', id);
+    </script>
+  </>
+)}

@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { CONTACT_EMAIL } from '../config';
+import { CONTACT_EMAIL, GTM_ID } from '../config';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <Base title="Datenschutzerklärung" description="Informationen zur Verarbeitung personenbezogener Daten auf Tracking-Check, einem Angebot von RichAds Digital Marketing.">
@@ -9,7 +9,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <p class="muted">Stand: November 2026</p>
   </section>
   <div class="narrow legal">
-    <h2>1. Verantwortlicher</h2>
+    <h2>Verantwortlicher</h2>
     <p>
       RichAds Digital Marketing<br />
       Inhaber: Ricard Rodríguez Parra<br />
@@ -18,32 +18,64 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </p>
     <p>Ein Datenschutzbeauftragter ist nicht benannt, da keine gesetzliche Pflicht dazu besteht.</p>
 
-    <h2>2. Überblick</h2>
-    <p>Diese Website setzt keine Cookies und verwendet keine Analyse- oder Werbetools. Personenbezogene Daten werden nur verarbeitet, soweit es für die Bereitstellung der Website, den kostenlosen Tracking-Check und die Bearbeitung Ihrer Anfragen erforderlich ist. Die Verbindung zur Website ist per TLS verschlüsselt.</p>
+    <h2>Überblick</h2>
+    {GTM_ID ? (
+      <p>Personenbezogene Daten werden verarbeitet, soweit es für die Bereitstellung der Website, den kostenlosen Tracking-Check und die Bearbeitung Ihrer Anfragen erforderlich ist. Analyse- und Marketingdienste setzen wir nur mit Ihrer Einwilligung ein (siehe Abschnitt „Cookies, Einwilligung und Messung“). Die Verbindung zur Website ist per TLS verschlüsselt.</p>
+    ) : (
+      <p>Diese Website setzt keine Cookies und verwendet keine Analyse- oder Werbetools. Personenbezogene Daten werden nur verarbeitet, soweit es für die Bereitstellung der Website, den kostenlosen Tracking-Check und die Bearbeitung Ihrer Anfragen erforderlich ist. Die Verbindung zur Website ist per TLS verschlüsselt.</p>
+    )}
 
-    <h2>3. Hosting der Website</h2>
+    <h2>Hosting der Website</h2>
     <p>Die Website wird bei GitHub Pages gehostet, einem Dienst der GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. Beim Aufruf der Website verarbeitet GitHub technisch notwendige Daten wie Ihre IP-Adresse, Datum und Uhrzeit des Zugriffs, die aufgerufene Seite sowie Browser- und Systeminformationen, um die Website auszuliefern und vor Missbrauch zu schützen.</p>
     <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt in einer sicheren und zuverlässigen Bereitstellung der Website. Für Übermittlungen in die USA stützt sich GitHub auf das EU-US Data Privacy Framework sowie auf Standardvertragsklauseln der EU-Kommission. Weitere Informationen: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">Datenschutzerklärung von GitHub</a>.</p>
 
-    <h2>4. Kostenloser Tracking-Check</h2>
+    <h2>Kostenloser Tracking-Check</h2>
     <p>Wenn Sie den Tracking-Check nutzen, werden die eingegebene Website-Adresse und Ihre IP-Adresse an unseren Prüfserver übermittelt. Der Server läuft bei Google Cloud (Google Cloud Run) in einem Rechenzentrum in Belgien. Anbieter ist die Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland.</p>
     <p>Der Server öffnet die eingegebene Website automatisch und wertet öffentlich abrufbare Informationen aus, etwa eingebundene Tags, Cookies und Einwilligungssignale. Ihre IP-Adresse wird ausschließlich im Arbeitsspeicher genutzt, um die Anzahl der Prüfungen pro Stunde zu begrenzen, und nicht dauerhaft gespeichert. Die geprüfte Adresse und das Ergebnis werden in den Server-Protokollen von Google Cloud gespeichert und nach spätestens 30 Tagen automatisch gelöscht.</p>
     <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung des von Ihnen angeforderten Tests) sowie Art. 6 Abs. 1 lit. f DSGVO (Schutz vor Missbrauch).</p>
 
-    <h2>5. Kontaktformular und Anfrage einer Auswertung</h2>
+    <h2>Kontaktformular und Anfrage einer Auswertung</h2>
     <p>Wenn Sie uns über das <a href={`${base}/kontakt/`}>Kontaktformular</a> schreiben oder nach dem Test eine persönliche Auswertung anfordern, verarbeiten wir die von Ihnen angegebenen Daten: Name, E-Mail-Adresse, Telefonnummer, Unternehmen, Website und Nachricht. Bei einer Anfrage nach dem Test kommt das Ergebnis der Prüfung hinzu.</p>
     <p>Die Angaben werden über unseren Prüfserver bei Google Cloud übertragen, in einer Tabelle in Google Sheets gespeichert und uns per Gmail zugestellt. Anbieter dieser Dienste ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Dabei kann eine Übermittlung an die Google LLC in den USA nicht ausgeschlossen werden. Google ist nach dem EU-US Data Privacy Framework zertifiziert und setzt zusätzlich Standardvertragsklauseln ein.</p>
     <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bearbeitung Ihrer Anfrage und vorvertragliche Maßnahmen) sowie Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie über das Kontrollkästchen im Formular erteilen und jederzeit mit Wirkung für die Zukunft widerrufen können.</p>
     <p>Wir löschen Ihre Daten, sobald Ihre Anfrage abschließend bearbeitet ist und kein Auftrag zustande kommt. Kommt ein Auftrag zustande, speichern wir die Daten für die Dauer der Zusammenarbeit und darüber hinaus nur, soweit gesetzliche Aufbewahrungspflichten bestehen.</p>
 
-    <h2>6. Kontakt per E-Mail</h2>
+    <h2>Kontakt per E-Mail</h2>
     <p>Wenn Sie uns direkt per E-Mail schreiben, verarbeiten wir Ihre E-Mail-Adresse und den Inhalt Ihrer Nachricht zur Bearbeitung Ihres Anliegens. Für die Rechtsgrundlage und die Speicherdauer gilt Abschnitt 5 entsprechend.</p>
 
-    <h2>7. Ihre Rechte</h2>
+
+    {GTM_ID && (
+      <>
+        <h2>Cookies, Einwilligung und Messung</h2>
+        <p>Beim ersten Besuch fragen wir über einen Banner, ob Sie Statistik- und Marketingdiensten zustimmen. Ohne Ihre Zustimmung setzen diese Dienste keine Cookies. Ihre Auswahl speichern wir im lokalen Speicher Ihres Browsers (Eintrag „tc_consent“ mit Auswahl und Zeitpunkt), damit der Banner nicht bei jedem Seitenaufruf erscheint. Das ist für die Funktion der Website erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG, Art. 6 Abs. 1 lit. c DSGVO).</p>
+        <p>Die Dienste unten nutzen wir nur mit Ihrer Einwilligung nach § 25 Abs. 1 TDDDG und Art. 6 Abs. 1 lit. a DSGVO. Sie können Ihre Einwilligung jederzeit über den Link „Cookie-Einstellungen“ im Fußbereich der Website widerrufen oder ändern.</p>
+        <p>Wir nutzen den Einwilligungsmodus von Google (Consent Mode v2). Solange Sie nicht zugestimmt haben, setzen die Google-Dienste keine Cookies und übermitteln lediglich cookielose Signale ohne Kennung, etwa Zeitpunkt, aufgerufene Seite und Einwilligungsstatus, damit Google Messlücken statistisch schätzen kann.</p>
+
+        <h3>Google Tag Manager</h3>
+        <p>Über den Google Tag Manager binden wir die unten genannten Dienste ein. Anbieter ist die Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Der Tag Manager selbst setzt keine Cookies, beim Laden wird jedoch Ihre IP-Adresse an Google übermittelt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; unser berechtigtes Interesse liegt in der zentralen Verwaltung der Dienste und der technischen Umsetzung Ihrer Einwilligung.</p>
+
+        <h3>Google Analytics 4 (Statistik)</h3>
+        <p>Mit Ihrer Einwilligung nutzen wir Google Analytics 4 der Google Ireland Limited, um zu verstehen, wie die Website genutzt wird, etwa welche Seiten aufgerufen und welche Anfragen gesendet werden. Dabei werden Cookies wie „_ga“ (Speicherdauer bis zu 2 Jahre) gesetzt. IP-Adressen werden von Google Analytics 4 nicht gespeichert. Die Daten werden nach 14 Monaten gelöscht.</p>
+
+        <h3>Microsoft Clarity (Statistik)</h3>
+        <p>Mit Ihrer Einwilligung nutzen wir Microsoft Clarity der Microsoft Ireland Operations Limited, One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, Irland. Clarity zeichnet Mausbewegungen, Klicks und Scrollverhalten auf und erstellt daraus Heatmaps und Sitzungsaufzeichnungen. Eingaben in Formularfelder werden dabei maskiert. Es werden Cookies wie „_clck“ (bis zu 1 Jahr) und „_clsk“ (1 Tag) gesetzt.</p>
+
+        <h3>Google Ads Conversion-Tracking und Remarketing (Marketing)</h3>
+        <p>Mit Ihrer Einwilligung messen wir mit Google Ads der Google Ireland Limited, ob ein Besuch über eine Anzeige zu einer Anfrage geführt hat, und können Besuchern unserer Website später passende Anzeigen zeigen. Dabei werden Cookies wie „_gcl_au“ (bis zu 90 Tage) gesetzt.</p>
+
+        <h3>Meta Pixel (Marketing)</h3>
+        <p>Mit Ihrer Einwilligung nutzen wir das Meta Pixel der Meta Platforms Ireland Limited, Merrion Road, Dublin 4, Irland, um die Wirkung unserer Anzeigen auf Facebook und Instagram zu messen und Besuchern passende Anzeigen zu zeigen. Dabei wird das Cookie „_fbp“ (bis zu 90 Tage) gesetzt. Für die Erhebung und Übermittlung der Daten an Meta sind wir gemeinsam mit Meta verantwortlich (Art. 26 DSGVO); die weitere Verarbeitung liegt allein bei Meta. Weitere Informationen: <a href="https://www.facebook.com/privacy/policy/" rel="noopener">Datenschutzrichtlinie von Meta</a>.</p>
+
+        <h3>Übermittlung in die USA</h3>
+        <p>Bei Google, Microsoft und Meta kann eine Übermittlung personenbezogener Daten an die jeweiligen Muttergesellschaften in den USA nicht ausgeschlossen werden. Alle drei Unternehmen sind nach dem EU-US Data Privacy Framework zertifiziert, das nach dem Angemessenheitsbeschluss der EU-Kommission ein angemessenes Datenschutzniveau gewährleistet.</p>
+      </>
+    )}
+
+    <h2>Ihre Rechte</h2>
     <p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) und Widerspruch gegen Verarbeitungen auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (Art. 21 DSGVO). Eine erteilte Einwilligung können Sie jederzeit widerrufen. Eine formlose E-Mail an <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> genügt.</p>
     <p>Sie haben außerdem das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren, insbesondere in dem Mitgliedstaat Ihres Wohnorts. Für uns zuständig ist die spanische Agencia Española de Protección de Datos (AEPD), C/ Jorge Juan 6, 28001 Madrid, <a href="https://www.aepd.es" rel="noopener">www.aepd.es</a>.</p>
 
-    <h2>8. Keine automatisierte Entscheidungsfindung</h2>
+    <h2>Keine automatisierte Entscheidungsfindung</h2>
     <p>Eine automatisierte Entscheidungsfindung einschließlich Profiling nach Art. 22 DSGVO findet nicht statt. Das Ergebnis des Tracking-Checks ist eine technische Auswertung der geprüften Website, keine Bewertung Ihrer Person.</p>
   </div>
 </Base>

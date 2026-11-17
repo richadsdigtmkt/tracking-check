@@ -25,6 +25,16 @@ date: 2026-11-20
   La URL sale del nombre del archivo (`mi-articulo.md` → `/blog/mi-articulo/`). Con `draft: true` no se publica. Cada push a `main` publica la web sola en un par de minutos.
 - **Impressum y Datenschutz:** `site/src/pages/impressum.astro` y `datenschutz.astro`. Obligatorios antes de dar a conocer la web.
 
+## Tracking y banner de cookies
+
+La web lleva un banner propio con Consent Mode v2 (todo denegado por defecto) y carga Google Tag Manager. Mientras `GTM_ID` en `site/src/config.ts` esté vacío no se carga nada y no aparece el banner. Al rellenarlo:
+
+- El banner guarda la elección en `localStorage` (`tc_consent`) y envía `gtag('consent','update', ...)` y el evento `consent_update` al dataLayer (en cada carga posterior, `consent_ready`).
+- Estadística = `analytics_storage` (GA4, Clarity). Marketing = `ad_storage`, `ad_user_data`, `ad_personalization` (Google Ads, Meta).
+- En GTM: GA4 y Ads usan el consentimiento nativo; Meta y Clarity deben llevar "consentimiento adicional requerido" (`ad_storage` y `analytics_storage` respectivamente).
+- En GA4, poner la retención de datos en 14 meses (lo dice la Datenschutz). En Clarity, mantener el enmascarado de campos.
+- La Datenschutz muestra automáticamente las secciones de GA4, Ads, Meta y Clarity cuando hay `GTM_ID`.
+
 ## Ver la web en local
 
 ```

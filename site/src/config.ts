@@ -4,6 +4,10 @@ export const BRAND = 'Tracking-Check';
 export const OWNER = 'Ricard';
 export const CONTACT_EMAIL = 'richadsdigitalmarketing@gmail.com';
 
+// ID del contenedor de Google Tag Manager (GTM-XXXXXXX). Vacío = sin tracking ni banner de cookies.
+// GA4, Google Ads, Meta y Clarity se configuran dentro de GTM.
+export const GTM_ID: string = (import.meta.env.PUBLIC_GTM_ID as string) || '';
+
 // URL del analizador en Cloud Run (sin barra final). Vacío = modo demo.
 export const API_URL = 'https://tracking-check-1065360973123.europe-west1.run.app';
 
