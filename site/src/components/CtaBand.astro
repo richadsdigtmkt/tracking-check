@@ -1,0 +1,17 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+interface Props { title?: string; text?: string; href?: string; label?: string; }
+const {
+  title = 'Tracking sauber aufsetzen lassen?',
+  text = 'Schreiben Sie mir kurz, um welche Website es geht. Sie erhalten eine Einschätzung und einen Festpreis.',
+  href = '/kontakt/',
+  label = 'Anfrage senden',
+} = Astro.props;
+---
+<div class="cta-band">
+  <div>
+    <h2>{title}</h2>
+    <p>{text}</p>
+  </div>
+  <a class="btn" href={`${base}${href}`}>{label}</a>
+</div>

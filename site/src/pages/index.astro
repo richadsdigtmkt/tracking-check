@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import Checker from '../components/Checker.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { getCollection } from 'astro:content';
+import { BRAND, PACKAGES } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: BRAND,
+  description: 'Einrichtung und Prüfung von Google Tag Manager, GA4, Google-Ads-Conversions und Consent Mode v2 für kleine und mittlere Unternehmen.',
+  url: new URL(`${base}/`, Astro.site).href,
+  areaServed: ['DE', 'AT', 'CH'],
+  knowsLanguage: ['de', 'en', 'es', 'ca'],
+};
+---
+<Base
+  title="Consent Mode v2 und Tracking kostenlos prüfen"
+  description="Prüfen Sie in 30 Sekunden, ob Ihre Website Consent Mode v2 korrekt nutzt, ob Tracking vor der Einwilligung startet und ob Google Ads und GA4 sauber messen."
+  schema={schema}
+>
+  <section style="padding:48px 0 10px">
+    <h1>Misst Ihr Tracking sauber, und erst nach der Einwilligung?</h1>
+    <p class="lead">Kostenloser Test in rund 30 Sekunden: Die Website wird wie von einem echten Besucher geöffnet und auf Cookie-Banner, Consent Mode v2, Google Analytics 4, Google Ads und Pixel von Drittanbietern geprüft.</p>
+    <Checker />
+  </section>
+
+  <h2>Was der Test prüft</h2>
+  <div class="grid">
+    <div class="card"><h3>Consent Mode v2</h3><p>Für Besucher aus dem EWR verlangt Google die v2-Signale. Fehlen sie, gehen Remarketing-Listen und Teile der Conversion-Messung in Google Ads verloren.</p></div>
+    <div class="card"><h3>Tracking vor der Einwilligung</h3><p>Cookies und Pixel, die starten, bevor der Besucher zustimmt, sind nach DSGVO und TDDDG ein Risiko für Abmahnungen.</p></div>
+    <div class="card"><h3>Doppelte oder fehlende Daten</h3><p>Mehrere Container oder Properties verzerren Ihre Zahlen. Kampagnen werden dann auf Basis falscher Daten optimiert.</p></div>
+  </div>
+
+  <h2>Wenn der Test Probleme findet</h2>
+  <p class="muted" style="max-width:720px">Ich richte Ihr Tracking so ein, dass Google Ads und GA4 korrekt messen und Ihre Besucher erst nach ihrer Zustimmung erfasst werden. Zum Festpreis, mit Bericht zur Freigabe, bevor etwas live geht.</p>
+  <div class="grid">
+    {PACKAGES.map((p) => (
+      <div class="card">
+        <h3>{p.name}</h3>
+        <p>{p.tagline}</p>
+      </div>
+    ))}
+  </div>
+  <p style="margin-top:18px"><a class="btn ghost" href={`${base}/preise/`}>Pakete und Preise ansehen</a></p>
+
+  {posts.length > 0 && (
+    <>
+      <h2>Aus dem Blog</h2>
+      <div class="post-list">
+        {posts.map((p) => (
+          <a class="card" href={`${base}/blog/${p.id}/`}>
+            <div class="date">{p.data.date.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+            <h3 style="margin:4px 0 6px">{p.data.title}</h3>
+            <p class="muted" style="margin:0">{p.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </>
+  )}
+
+  <CtaBand />
+  <p class="small muted">Der Test ist eine automatische Momentaufnahme der eingegebenen Seite und ersetzt keine Rechtsberatung.</p>
+</Base>

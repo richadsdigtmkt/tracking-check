@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const services = [
+  { t: 'Google Tag Manager', d: 'Ein sauber aufgebauter Container mit klarer Benennung, damit Ihr Team oder Ihre Agentur später den Überblick behält.' },
+  { t: 'Google Analytics 4', d: 'Die Ereignisse, die für Ihr Geschäft zählen: Anfragen, Anrufe, Buchungen oder Käufe. Ohne doppelt gezählte Seitenaufrufe.' },
+  { t: 'Google-Ads-Conversions', d: 'Conversions, die Google Ads wirklich zur Optimierung nutzen kann, inklusive Enhanced Conversions, wo es passt.' },
+  { t: 'Consent Mode v2', d: 'Anbindung an Ihren Cookie-Banner, damit Google die Einwilligungssignale erhält und vor der Zustimmung nichts gesetzt wird.' },
+  { t: 'Meta Pixel und Conversions API', d: 'Für Werbung auf Facebook und Instagram: Pixel und serverseitige Übertragung, abgestimmt auf die Einwilligung.' },
+  { t: 'Buchungstools und mehrere Domains', d: 'Calendly, Terminbuchungen in iframes, externe Shops oder Länderseiten: Die Quelle eines Besuchers geht dabei nicht verloren.' },
+];
+const cmps = ['Borlabs Cookie', 'Complianz', 'Cookiebot', 'Usercentrics', 'CCM19', 'consentmanager', 'CookieYes', 'Real Cookie Banner'];
+const systems = ['WordPress', 'Shopify', 'Shopware', 'Wix', 'Magento', 'TYPO3', 'Contao', 'JTL-Shop', 'Jimdo'];
+---
+<Base title="Leistungen: Tracking und Consent Mode einrichten" description="Google Tag Manager, GA4, Google-Ads-Conversions, Consent Mode v2 und Meta Pixel: Einrichtung und Prüfung für kleine und mittlere Unternehmen in Deutschland, Österreich und der Schweiz.">
+  <section class="page-head">
+    <h1>Tracking, auf das Sie sich verlassen können</h1>
+    <p class="lead">Ich richte das Tracking Ihrer Website so ein, dass Ihre Werbung mit echten Zahlen arbeitet und Ihre Besucher erst nach ihrer Zustimmung erfasst werden.</p>
+  </section>
+
+  <div class="grid">
+    {services.map((s) => (<div class="card"><h3>{s.t}</h3><p>{s.d}</p></div>))}
+  </div>
+
+  <h2>Für wen</h2>
+  <p style="max-width:720px">Für kleine und mittlere Unternehmen, die Google Ads oder Meta Ads schalten und wissen wollen, ob die Zahlen stimmen. Und für Agenturen, die das Tracking ihrer Kunden auslagern möchten.</p>
+
+  <h2>Mit Ihren bestehenden Tools</h2>
+  <p class="muted" style="max-width:720px">Sie müssen weder Ihr Shopsystem noch Ihren Cookie-Banner wechseln. Ich arbeite unter anderem mit:</p>
+  <div class="grid">
+    <div class="card"><h3>Cookie-Banner</h3><p>{cmps.join(', ')}</p></div>
+    <div class="card"><h3>Website- und Shopsysteme</h3><p>{systems.join(', ')}</p></div>
+  </div>
+
+  <h2>Was Sie am Ende haben</h2>
+  <ul class="ticks" style="max-width:720px">
+    <li>Ein Tracking, das nachweislich funktioniert, getestet vor und nach der Einwilligung</li>
+    <li>Einen Bericht über alles, was eingerichtet wurde, zur Freigabe vor der Aktivierung</li>
+    <li>Eine Kontrolle wenige Tage nach dem Livegang</li>
+    <li>Alle Zugänge bleiben bei Ihnen</li>
+  </ul>
+  <p style="margin-top:22px"><a class="btn ghost" href={`${base}/preise/`}>Pakete und Preise</a></p>
+  <CtaBand />
+</Base>

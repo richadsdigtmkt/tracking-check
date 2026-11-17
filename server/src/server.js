@@ -1,5 +1,4 @@
 const express = require('express');
-const path = require('path');
 const crypto = require('crypto');
 const { scan } = require('./scanner');
 const { analyze } = require('./analyze');
@@ -28,7 +27,6 @@ app.use('/api', (req, res, next) => {
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
-app.use(express.static(path.join(__dirname, '..', 'public'), { extensions: ['html'] }));
 
 // --- límite de escaneos por IP (en memoria, suficiente para empezar) ---
 const hits = new Map();
@@ -115,6 +113,9 @@ app.post('/api/lead', async (req, res) => {
     name,
     email,
     phone: String(b.phone || '').trim().slice(0, 50),
+    company: String(b.company || '').trim().slice(0, 150),
+    message: String(b.message || '').trim().slice(0, 3000),
+    source: String(b.source || 'checker').slice(0, 30),
     url: stored ? stored.data.report.finalUrl || stored.data.report.url : String(b.url || '').slice(0, 300),
     level: stored ? stored.data.report.level : '',
     headline: stored ? stored.data.report.headline : '',
@@ -140,6 +141,7 @@ app.post('/api/lead', async (req, res) => {
 });
 
 app.get('/healthz', (_req, res) => res.send('ok'));
+app.get('/', (_req, res) => res.type('text').send('Consent-Check API'));
 
 if (require.main === module) {
   app.listen(PORT, () => console.log(`Consent-Check läuft auf Port ${PORT}`));

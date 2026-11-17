@@ -1,77 +1,77 @@
 # Consent-Check
 
-Checker gratuito en alemán: el visitante mete su URL, el servidor abre la web con Chromium como un visitante real y devuelve un semáforo de síntomas (banner, Consent Mode v2, GA4, Google Ads, cookies y píxeles antes del consentimiento). Si quiere la valoración personal deja su email y te llega el lead a una Google Sheet y por correo, con los IDs de GTM, GA4, Ads y la CMP detectada.
+Web del servicio de tracking (en alemán) con checker gratuito de Consent Mode v2 y blog.
 
-El visitante solo ve síntomas. La causa y la solución son el servicio de pago.
+| Carpeta | Qué es | Dónde corre |
+|---|---|---|
+| `site/` | Web estática con Astro: inicio con checker, Leistungen, Preise, Ablauf, Über mich, Kontakt, blog | GitHub Pages (gratis) |
+| `server/` | Analizador: abre la web con Chromium y devuelve síntomas; recibe los leads | Google Cloud Run |
 
-## Qué comprueba
+Mientras `API_URL` esté vacío en `site/src/config.ts`, el checker funciona en modo demo (resultado de ejemplo) y el formulario de contacto abre el email.
 
-| Check | Cómo |
-|---|---|
-| Banner / CMP | Peticiones y DOM de unos 20 CMP (Borlabs, Cookiebot, Usercentrics, CCM19, consentmanager, Complianz, CookieYes, OneTrust, Real Cookie Banner...) |
-| GTM duplicado | IDs de `gtm.js` |
-| GA4 / Google Ads | `gtag/js`, `tid` de los hits de GA4, rutas de conversión de Ads |
-| Consent Mode v2 | Parámetros `gcs` y `gcd` en los hits a Google |
-| Google antes del consentimiento | Hits antes de tocar el banner: sin señal, con `granted` o cookieless (G100) |
-| Cookies antes del consentimiento | `_ga`, `_gcl_au`, `_fbp`, `_ttp`, `_uet*`, `_clck`, `_hj`... |
-| Píxeles antes del consentimiento | Meta, TikTok, LinkedIn, Pinterest, Clarity, Bing UET, Hotjar |
-| Después de aceptar | Pulsa "aceptar todo" (selectores conocidos y, si no, el texto del botón) y vuelve a medir |
+## Cosas que se cambian a menudo
 
-## Probarlo primero en tu ordenador
-
-Necesitas Node 20 o superior.
+- **Marca, email, precios y paquetes:** `site/src/config.ts`. Para mostrar precio en un paquete, pon por ejemplo `price: 'ab 290 €'`; con `null` sale "Festpreis nach kurzer Prüfung".
+- **Artículos del blog:** un archivo `.md` por artículo en `site/src/content/blog/`. Cabecera obligatoria:
 
 ```
+---
+title: "Título del artículo"
+description: "Meta description, unos 150 caracteres"
+date: 2026-11-20
+---
+```
+
+  La URL sale del nombre del archivo (`mi-articulo.md` → `/blog/mi-articulo/`). Con `draft: true` no se publica. Cada push a `main` publica la web sola en un par de minutos.
+- **Impressum y Datenschutz:** `site/src/pages/impressum.astro` y `datenschutz.astro`. Obligatorios antes de dar a conocer la web.
+
+## Ver la web en local
+
+```
+cd site
+npm install
+npm run dev
+```
+
+## Pasar a dominio propio
+
+1. Compra el dominio (por ejemplo un .de en INWX).
+2. En `.github/workflows/pages.yml` cambia `SITE_URL` a `https://tudominio.de` y `BASE_PATH` a `/`.
+3. En GitHub, Settings > Pages > Custom domain, pon el dominio y crea en el DNS los registros que indique GitHub. Marca "Enforce HTTPS".
+
+## Analizador en Cloud Run
+
+Probar en local (Node 20 o superior):
+
+```
+cd server
 npm install
 npx playwright install chromium
 npm start
+npm test
 ```
 
-Abre http://localhost:8080 y prueba con webs de clientes cuyo estado real conoces. Así ves si el semáforo dice lo mismo que dirías tú.
+Desplegar desde GitHub: crea en el repo los secretos `GCP_PROJECT` y `GCP_SA_KEY` (JSON de una cuenta de servicio con roles Cloud Run Admin, Cloud Build Editor, Artifact Registry Admin, Service Account User y Storage Admin) y lanza el workflow **Deploy Cloud Run** en la pestaña Actions. Después copia la URL del servicio en `API_URL` de `site/src/config.ts`.
 
-Tests: `npm test` (para el test de extremo a extremo hace falta Chromium instalado).
-
-## Desplegar en Google Cloud Run
-
-1. Instala Google Cloud CLI y entra: `gcloud auth login`
-2. Crea un proyecto (o usa uno tuyo) y actívalo:
-   `gcloud config set project TU-PROYECTO`
-3. Desde esta carpeta:
+Desplegar a mano:
 
 ```
-gcloud run deploy consent-check --source . --region europe-west1 --allow-unauthenticated --memory 2Gi --cpu 2 --concurrency 2 --timeout 120 --max-instances 3 --set-env-vars MAX_CONCURRENT=2,SCANS_PER_HOUR=10
+gcloud run deploy consent-check --source server --region europe-west1 --allow-unauthenticated --memory 2Gi --cpu 2 --concurrency 2 --timeout 120 --max-instances 3 --update-env-vars MAX_CONCURRENT=2,SCANS_PER_HOUR=10,ALLOWED_ORIGINS=https://richadsdigtmkt.github.io
 ```
 
-Usa una región de la UE. Los CMP muestran el banner según el país, y el servidor tiene que verse como un visitante europeo.
-
-`--max-instances 3` limita lo que puedes llegar a gastar si alguien abusa del checker.
+`ALLOWED_ORIGINS` tiene que incluir el dominio desde el que se sirve la web (separados por comas). Pon también una alerta de presupuesto en Google Cloud.
 
 ### Leads a Google Sheets
 
-1. Crea una Google Sheet, abre Extensiones > Apps Script y pega `apps-script/Code.gs`.
+1. Crea una Google Sheet, abre Extensiones > Apps Script y pega `server/apps-script/Code.gs`.
 2. Cambia `SECRET` y `NOTIFY_EMAIL`.
-3. Desplegar > Nueva implementación > Aplicación web, que se ejecute como tú y con acceso para cualquier usuario. Copia la URL.
-4. Añade las variables al servicio:
+3. Implementar como aplicación web (ejecutar como tú, acceso para cualquier usuario) y copia la URL.
+4. Añade al servicio `LEAD_WEBHOOK_URL` y `LEAD_WEBHOOK_SECRET` como variables de entorno.
 
-```
-gcloud run services update consent-check --region europe-west1 --update-env-vars LEAD_WEBHOOK_URL=https://script.google.com/macros/s/XXXX/exec,LEAD_WEBHOOK_SECRET=tu-secreto
-```
+Cada lead y cada escaneo queda además en los logs de Cloud Run.
 
-Aunque no configures el webhook, cada lead y cada escaneo queda en los logs de Cloud Run (Cloud Logging, buscando `"type":"lead"`).
+## Qué comprueba el checker
 
-### Dominio propio
+Banner/CMP (unos 20 proveedores), GTM y GA4 duplicados, tag de Google Ads, Consent Mode v2 (`gcs`/`gcd`), datos a Google antes del consentimiento, cookies y píxeles antes del consentimiento, y el comportamiento después de pulsar "aceptar todo".
 
-En Cloud Run > Gestionar dominios personalizados, añade el dominio y crea en tu DNS los registros que te indique. Si la región no admite la asignación de dominios, pon delante Firebase Hosting con un rewrite al servicio.
-
-## Antes de publicarlo
-
-- Rellena `public/impressum.html` y `public/datenschutz.html`. En Alemania es obligatorio. La política de privacidad tiene que mencionar el hosting en Google Cloud, el envío de leads a Google Sheets/Gmail y que se guardan la URL analizada y el email.
-- Si quieres cambiar el nombre "Consent-Check", está en el `<title>` y en el logo de `public/index.html`.
-
-## Limitaciones conocidas
-
-- Analiza solo la URL que se introduce (normalmente la home), no recorre el embudo hasta la thank-you page.
-- Webs con protección anti-bots (Cloudflare en modo estricto) pueden bloquear el escaneo.
-- Si no reconoce el botón de aceptar, el análisis posterior al consentimiento queda incompleto y la web lo indica.
-- Server-side tagging con dominio propio se detecta solo en parte (si los hits salen a un subdominio propio en vez de a Google).
-- El límite de escaneos por IP vive en memoria: vale para empezar. Si hay abuso, añade Cloudflare Turnstile al formulario.
+Limitaciones: analiza solo la URL introducida, webs con anti-bots estricto pueden bloquearlo, y el server-side tagging con dominio propio se detecta solo en parte.

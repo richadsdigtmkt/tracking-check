@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { OWNER } from '../config';
+---
+<Base title="Über mich" description="Ricard, Spezialist für Tracking und Google Ads aus Barcelona. Für kleine und mittlere Unternehmen in Deutschland, Österreich und der Schweiz.">
+  <section class="page-head narrow">
+    <h1>Über mich</h1>
+    <p class="lead">Ich bin {OWNER}, Spezialist für Tracking und Google Ads mit Sitz in Barcelona.</p>
+  </section>
+  <div class="narrow">
+    <p>Ich arbeite für kleine und mittlere Unternehmen in Deutschland, Österreich und der Schweiz, direkt oder im Auftrag von Agenturen. Neben dem Tracking betreue ich Google-Ads-Kampagnen. Dort sehe ich täglich, was passiert, wenn Conversions falsch oder gar nicht gemessen werden: Budgets fließen in die falschen Kampagnen und niemand merkt es.</p>
+    <p>Deshalb lege ich Wert auf ein Tracking, das nachweislich funktioniert. Ich teste vor und nach der Einwilligung, dokumentiere alles und aktiviere erst nach Ihrer Freigabe.</p>
+    <h2>Was Sie erwarten können</h2>
+    <ul class="ticks">
+      <li>Festpreise statt Stundenabrechnung</li>
+      <li>Kurze, klare Kommunikation per E-Mail oder WhatsApp</li>
+      <li>Ehrliche Einschätzung, auch wenn die Antwort ist, dass nicht viel zu tun ist</li>
+      <li>Arbeit auf Deutsch, Englisch, Spanisch oder Katalanisch</li>
+    </ul>
+  </div>
+  <CtaBand />
+</Base>

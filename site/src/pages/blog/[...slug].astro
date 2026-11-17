@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { getCollection, render } from 'astro:content';
+import { BRAND, OWNER } from '../../config';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+const { post } = Astro.props;
+const { Content } = await render(post);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const fmt = (d: Date) => d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date.toISOString(),
+  dateModified: (post.data.updated ?? post.data.date).toISOString(),
+  author: { '@type': 'Person', name: OWNER },
+  publisher: { '@type': 'Organization', name: BRAND },
+  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href,
+  inLanguage: 'de-DE',
+};
+---
+<Base title={post.data.title} description={post.data.description} schema={schema} ogType="article">
+  <article class="post narrow">
+    <p class="small"><a href={`${base}/blog/`}>← Alle Artikel</a></p>
+    <h1>{post.data.title}</h1>
+    <div class="post-meta">{OWNER} · {fmt(post.data.date)}{post.data.updated && ` · aktualisiert am ${fmt(post.data.updated)}`}</div>
+    <Content />
+  </article>
+  <CtaBand title="Ihre Website in 30 Sekunden prüfen" text="Der kostenlose Test zeigt, ob Consent Mode v2 greift und ob vor der Einwilligung schon Daten fließen." href="/" label="Kostenlos testen" />
+</Base>

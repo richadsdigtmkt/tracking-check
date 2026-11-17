@@ -6,7 +6,6 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY src ./src
-COPY public ./public
 USER pwuser
 ENV PORT=8080
 EXPOSE 8080

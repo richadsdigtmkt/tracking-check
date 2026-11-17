@@ -1,0 +1,89 @@
+---
+import { API_URL } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<form class="scan" id="scanForm" novalidate>
+  <input type="text" id="url" name="url" placeholder="ihre-website.de" autocomplete="url" inputmode="url" aria-label="Website-Adresse" required />
+  <button type="submit" class="btn" id="scanBtn">Jetzt prüfen</button>
+</form>
+<div class="small muted" style="margin-top:10px">Kostenlos, ohne Anmeldung. Diese Seite setzt keine Cookies.</div>
+<div class="error" id="scanError"></div>
+
+<section class="card checker-loading" id="loading">
+  <strong>Ihre Website wird geprüft…</strong>
+  <div class="bar"><i id="barFill"></i></div>
+  <ul class="steps" id="steps">
+    <li>Seite wie ein echter Besucher öffnen</li>
+    <li>Cookie-Banner und Consent-Tool erkennen</li>
+    <li>Daten prüfen, die vor der Einwilligung gesendet werden</li>
+    <li>Einwilligung erteilen und Tags erneut messen</li>
+    <li>Ergebnis auswerten</li>
+  </ul>
+</section>
+
+<section class="card checker-result" id="result">
+  <div class="verdict">
+    <div class="light" id="light"></div>
+    <div>
+      <h2 id="headline"></h2>
+      <p id="checkedUrl"></p>
+    </div>
+  </div>
+  <ul class="checks" id="checks"></ul>
+</section>
+
+<section class="card checker-result cta-lead" id="cta">
+  <h3>Persönliche Auswertung anfordern</h3>
+  <p class="muted">Ich sehe mir das Ergebnis Ihrer Website genauer an und melde mich per E-Mail mit einer Einschätzung, was zu tun ist, und einem Festpreis für die Umsetzung. Unverbindlich.</p>
+  <form id="leadForm" novalidate>
+    <div class="row">
+      <input type="text" name="name" placeholder="Ihr Name" autocomplete="name" />
+      <input type="email" name="email" placeholder="E-Mail-Adresse *" autocomplete="email" required />
+    </div>
+    <input type="tel" name="phone" placeholder="Telefon (optional)" autocomplete="tel" />
+    <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <label class="chk"><input type="checkbox" name="privacy" required /> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verwendet werden. Details in der <a href={`${base}/datenschutz/`}>Datenschutzerklärung</a>.</span></label>
+    <div><button type="submit" class="btn" id="leadBtn">Auswertung anfordern</button></div>
+    <div class="error" id="leadError"></div>
+  </form>
+  <div class="thanks" id="thanks">Danke! Ich melde mich in Kürze per E-Mail bei Ihnen.</div>
+  <p class="small muted" style="margin:16px 0 0">Oder direkt ansehen: <a href={`${base}/preise/`}>Pakete und Preise</a> · <a href={`${base}/ablauf/`}>So läuft die Zusammenarbeit</a></p>
+</section>
+
+<div class="card demo-note" id="demoNote"><strong>Demo-Version:</strong> Diese Vorschau zeigt ein Beispielergebnis. Die echte Prüfung läuft, sobald der Server verbunden ist.</div>
+
+<script is:inline define:vars={{ apiUrl: API_URL }}>window.CC_API = apiUrl;</script>
+<script is:inline src={`${base}/checker.js`}></script>
+
+<style>
+  form.scan { display: flex; gap: 10px; flex-wrap: wrap; }
+  form.scan input { flex: 1 1 320px; width: auto; }
+  .checker-loading, .checker-result, .demo-note { display: none; margin: 22px 0; }
+  .demo-note { background: #fff8e1; border-color: #f0d58a; }
+  .bar { height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; margin-top: 14px; }
+  .bar :global(i) { display: block; height: 100%; width: 0; background: var(--brand); transition: width .6s ease; }
+  .steps { list-style: none; padding: 0; margin: 12px 0 0; }
+  .steps :global(li) { padding: 6px 0; color: var(--muted); }
+  .steps :global(li.done) { color: var(--ink); }
+  .steps :global(li.done)::before { content: "✓ "; color: var(--green); font-weight: 700; }
+  .steps :global(li.active)::before { content: "… "; color: var(--brand); font-weight: 700; }
+  .verdict { display: flex; align-items: center; gap: 16px; }
+  .light { width: 54px; height: 54px; border-radius: 50%; flex: none; }
+  .light:global(.red) { background: var(--red); box-shadow: 0 0 0 8px var(--red-bg); }
+  .light:global(.yellow) { background: #e0a100; box-shadow: 0 0 0 8px var(--yellow-bg); }
+  .light:global(.green) { background: var(--green); box-shadow: 0 0 0 8px var(--green-bg); }
+  .verdict h2 { margin: 0; font-size: 24px; }
+  .verdict p { margin: 2px 0 0; color: var(--muted); word-break: break-all; }
+  .checks { list-style: none; padding: 0; margin: 22px 0 0; }
+  .checks :global(li) { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .checks :global(.badge) { flex: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 4px 8px; border-radius: 6px; height: fit-content; min-width: 86px; text-align: center; }
+  .checks :global(.badge.fail) { color: var(--red); background: var(--red-bg); }
+  .checks :global(.badge.warn) { color: var(--yellow); background: var(--yellow-bg); }
+  .checks :global(.badge.ok) { color: var(--green); background: var(--green-bg); }
+  .checks :global(.badge.info) { color: var(--info); background: var(--info-bg); }
+  .checks :global(strong) { display: block; }
+  .checks :global(span.d) { color: var(--muted); font-size: 15px; }
+  .cta-lead form { display: grid; gap: 10px; }
+  .cta-lead .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cta-lead .row input { flex: 1 1 240px; width: auto; }
+</style>

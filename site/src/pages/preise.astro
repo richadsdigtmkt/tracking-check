@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { PACKAGES } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Base title="Preise: Tracking-Analyse und Tracking-Setup zum Festpreis" description="Tracking-Analyse, Standard-Setup und erweitertes Setup für Google Tag Manager, GA4, Google Ads und Consent Mode v2. Festpreis nach kurzer Prüfung Ihrer Website.">
+  <section class="page-head">
+    <h1>Pakete und Preise</h1>
+    <p class="lead">Jede Website ist etwas anders. Deshalb sehe ich mir Ihre Seite kurz an und nenne Ihnen danach einen Festpreis. Ohne Stundenabrechnung und ohne Überraschungen.</p>
+  </section>
+  <div class="grid">
+    {PACKAGES.map((p) => (
+      <div class={`card price-card${p.highlight ? ' highlight' : ''}`}>
+        {p.highlight && <span class="badge-top">Am häufigsten</span>}
+        <h3>{p.name}</h3>
+        <p class="muted" style="margin:0">{p.tagline}</p>
+        {p.price ? <div class="price">{p.price}</div> : <div class="price onrequest">Festpreis nach kurzer Prüfung</div>}
+        <ul class="ticks">{p.items.map((i) => <li>{i}</li>)}</ul>
+        <a class={`btn${p.highlight ? '' : ' ghost'}`} href={`${base}/kontakt/?paket=${p.id}`}>Angebot anfragen</a>
+      </div>
+    ))}
+  </div>
+
+  <h2>Häufige Fragen</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(380px,1fr))">
+    <div class="card"><h3>Warum kein Preis von der Stange?</h3><p>Ein WordPress-Blog mit Kontaktformular und ein Shop mit externem Buchungstool sind sehr unterschiedliche Aufgaben. Nach einem kurzen Blick auf Ihre Website kenne ich den Aufwand und nenne einen festen Preis.</p></div>
+    <div class="card"><h3>Was brauche ich von Ihnen?</h3><p>Zugänge zu Google Tag Manager, GA4 und Google Ads sowie zum Backend Ihrer Website, falls nötig. Ich sage Ihnen genau, welche.</p></div>
+    <div class="card"><h3>Wie lange dauert es?</h3><p>Ein Standard-Setup ist meist innerhalb weniger Werktage erledigt, sobald die Zugänge da sind.</p></div>
+    <div class="card"><h3>Arbeiten Sie auch für Agenturen?</h3><p>Ja. Ich übernehme das Tracking für Kunden von Agenturen, auf Wunsch ohne eigenen Auftritt gegenüber dem Endkunden.</p></div>
+  </div>
+  <CtaBand title="Festpreis für Ihre Website anfragen" />
+</Base>

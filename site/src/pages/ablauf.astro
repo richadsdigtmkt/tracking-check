@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+const steps = [
+  { t: 'Anfrage oder kostenloser Test', d: 'Sie schicken mir Ihre Website über das Kontaktformular oder fordern nach dem Test eine Auswertung an.' },
+  { t: 'Kurze Prüfung und Festpreis', d: 'Ich sehe mir Ihre Website an und schicke Ihnen, was zu tun ist, und einen festen Preis.' },
+  { t: 'Zugänge', d: 'Nach Ihrer Zusage nenne ich Ihnen genau die Zugänge, die ich brauche. Nicht mehr.' },
+  { t: 'Umsetzung', d: 'Ich richte alles ein und teste es vor und nach der Einwilligung, in mehreren Browsern.' },
+  { t: 'Bericht zur Freigabe', d: 'Bevor etwas live geht, erhalten Sie einen Bericht über alles, was eingerichtet wurde. Erst nach Ihrer Freigabe wird aktiviert.' },
+  { t: 'Kontrolle nach dem Start', d: 'Wenige Tage nach der Aktivierung prüfe ich, ob die Daten korrekt ankommen, und schicke Ihnen das Ergebnis.' },
+];
+---
+<Base title="Ablauf: So läuft die Zusammenarbeit" description="Von der Anfrage bis zur Kontrolle nach dem Livegang: Festpreis, Bericht zur Freigabe vor der Aktivierung und Kontrolle wenige Tage danach.">
+  <section class="page-head narrow">
+    <h1>So läuft die Zusammenarbeit</h1>
+    <p class="lead">Klare Schritte, ein fester Preis und nichts geht live, ohne dass Sie es freigegeben haben.</p>
+  </section>
+  <ol class="steps-list narrow">
+    {steps.map((s) => (<li><h3>{s.t}</h3><p>{s.d}</p></li>))}
+  </ol>
+  <p class="narrow muted">Danach bin ich weiter erreichbar, wenn sich auf Ihrer Website etwas ändert oder Sie Fragen zu Ihren Zahlen haben.</p>
+  <CtaBand />
+</Base>

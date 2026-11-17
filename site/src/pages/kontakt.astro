@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import { API_URL, CONTACT_EMAIL, PACKAGES } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Base title="Kontakt und Anfrage" description="Schicken Sie mir Ihre Website und erhalten Sie eine Einschätzung und einen Festpreis für Ihr Tracking-Setup.">
+  <section class="page-head narrow">
+    <h1>Anfrage senden</h1>
+    <p class="lead">Schreiben Sie mir kurz, um welche Website es geht und was Sie vorhaben. Sie erhalten in der Regel innerhalb eines Werktags eine Antwort mit Einschätzung und Festpreis.</p>
+  </section>
+  <div class="card narrow">
+    <form id="contactForm" novalidate style="display:grid;gap:12px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <input type="text" name="name" placeholder="Ihr Name" autocomplete="name" style="flex:1 1 220px;width:auto" />
+        <input type="email" name="email" placeholder="E-Mail-Adresse *" autocomplete="email" required style="flex:1 1 220px;width:auto" />
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <input type="text" name="company" placeholder="Unternehmen" autocomplete="organization" style="flex:1 1 220px;width:auto" />
+        <input type="text" name="url" placeholder="Ihre Website" autocomplete="url" style="flex:1 1 220px;width:auto" />
+      </div>
+      <input type="tel" name="phone" placeholder="Telefon (optional)" autocomplete="tel" />
+      <textarea name="message" placeholder="Worum geht es? Zum Beispiel: Google Ads läuft, aber die Conversions stimmen nicht."></textarea>
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <label class="chk"><input type="checkbox" name="privacy" required /> <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verwendet werden. Details in der <a href={`${base}/datenschutz/`}>Datenschutzerklärung</a>.</span></label>
+      <div><button type="submit" class="btn" id="contactBtn">Anfrage senden</button></div>
+      <div class="error" id="contactError"></div>
+    </form>
+    <div class="thanks" id="contactThanks">Danke für Ihre Anfrage! Ich melde mich in Kürze bei Ihnen.</div>
+  </div>
+  <p class="narrow muted" style="margin-top:18px">Lieber direkt per E-Mail? <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+
+  <script is:inline define:vars={{ apiUrl: API_URL, email: CONTACT_EMAIL, packages: PACKAGES.map((p) => [p.id, p.name]) }}>
+    (function () {
+      var f = document.getElementById('contactForm');
+      var err = document.getElementById('contactError');
+      var paket = new URLSearchParams(location.search).get('paket');
+      var match = packages.filter(function (p) { return p[0] === paket; })[0];
+      if (match) f.message.value = 'Ich interessiere mich für: ' + match[1] + '\n\n';
+      var api = (apiUrl || '').replace(/\/$/, '');
+      f.addEventListener('submit', function (e) {
+        e.preventDefault();
+        err.textContent = '';
+        var d = { source: 'kontakt', name: f.name.value, email: f.email.value, company: f.company.value, url: f.url.value, phone: f.phone.value, message: f.message.value, website: f.website.value, privacy: f.privacy.checked };
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) { err.textContent = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.'; return; }
+        if (!d.privacy) { err.textContent = 'Bitte bestätigen Sie die Datenschutzerklärung.'; return; }
+        var done = function () { f.style.display = 'none'; document.getElementById('contactThanks').style.display = 'block'; };
+        if (!api) {
+          var body = 'Name: ' + d.name + '\nUnternehmen: ' + d.company + '\nWebsite: ' + d.url + '\nTelefon: ' + d.phone + '\n\n' + d.message;
+          location.href = 'mailto:' + email + '?subject=' + encodeURIComponent('Anfrage Tracking: ' + (d.url || d.company || d.name)) + '&body=' + encodeURIComponent(body);
+          return;
+        }
+        var btn = document.getElementById('contactBtn'); btn.disabled = true;
+        fetch(api + '/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) { if (!res.ok) { err.textContent = res.j.error || 'Senden fehlgeschlagen.'; return; } done(); })
+          .catch(function () { err.textContent = 'Verbindungsfehler. Bitte schreiben Sie direkt an ' + email + '.'; })
+          .then(function () { btn.disabled = false; });
+      });
+    })();
+  </script>
+</Base>
