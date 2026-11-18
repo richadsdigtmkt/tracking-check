@@ -14,8 +14,8 @@ concurrency:
   group: pages
   cancel-in-progress: true
 env:
-  SITE_URL: https://richadsdigtmkt.github.io
-  BASE_PATH: /tracking-check
+  SITE_URL: https://tracking-check.de
+  BASE_PATH: /
 jobs:
   build:
     runs-on: ubuntu-latest
