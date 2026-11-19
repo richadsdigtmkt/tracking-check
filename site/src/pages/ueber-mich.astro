@@ -2,11 +2,18 @@
 import Base from '../layouts/Base.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { OWNER } from '../config';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <Base title="Über mich" description="Ricard, Spezialist für Tracking und Google Ads aus Barcelona. Für kleine und mittlere Unternehmen in Deutschland, Österreich und der Schweiz.">
-  <section class="page-head narrow">
-    <h1>Über mich</h1>
-    <p class="lead">Ich bin {OWNER}, Spezialist für Tracking und Google Ads mit Sitz in Barcelona.</p>
+  <section class="page-head narrow about-head">
+    <picture>
+      <source srcset={`${base}/img/ricard.webp`} type="image/webp" />
+      <img src={`${base}/img/ricard.jpg`} width="600" height="900" alt={`${OWNER}, Spezialist für Tracking und Google Ads`} class="about-photo" />
+    </picture>
+    <div>
+      <h1>Über mich</h1>
+      <p class="lead">Ich bin {OWNER}, Spezialist für Tracking und Google Ads mit Sitz in Barcelona.</p>
+    </div>
   </section>
   <div class="narrow">
     <p>Ich arbeite für kleine und mittlere Unternehmen in Deutschland, Österreich und der Schweiz, direkt oder im Auftrag von Agenturen. Neben dem Tracking betreue ich Google-Ads-Kampagnen. Dort sehe ich täglich, was passiert, wenn Conversions falsch oder gar nicht gemessen werden: Budgets fließen in die falschen Kampagnen und niemand merkt es.</p>
@@ -21,3 +28,11 @@ import { OWNER } from '../config';
   </div>
   <CtaBand />
 </Base>
+<style>
+  .about-head { display: grid; grid-template-columns: 200px 1fr; gap: 28px; align-items: center; }
+  .about-photo { width: 200px; height: auto; border-radius: 14px; display: block; }
+  @media (max-width: 640px) {
+    .about-head { grid-template-columns: 1fr; }
+    .about-photo { width: 160px; }
+  }
+</style>

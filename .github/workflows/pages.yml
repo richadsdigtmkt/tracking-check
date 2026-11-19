@@ -6,6 +6,9 @@ on:
     branches: [main]
     paths: ['site/**', '.github/workflows/pages.yml']
   workflow_dispatch:
+  # Recompila cada mañana (06:17 en Madrid en invierno) para publicar los artículos cuya fecha ha llegado.
+  schedule:
+    - cron: '17 5 * * *'
 permissions:
   contents: read
   pages: write

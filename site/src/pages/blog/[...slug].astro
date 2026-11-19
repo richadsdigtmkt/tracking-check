@@ -1,11 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CtaBand from '../../components/CtaBand.astro';
+import { isPublished } from '../../lib/posts';
 import { getCollection, render } from 'astro:content';
 import { BRAND, OWNER } from '../../config';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const posts = await getCollection('blog', isPublished);
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 const { post } = Astro.props;
@@ -19,7 +20,7 @@ const schema = {
   description: post.data.description,
   datePublished: post.data.date.toISOString(),
   dateModified: (post.data.updated ?? post.data.date).toISOString(),
-  author: { '@type': 'Person', name: OWNER },
+  author: { '@type': 'Person', name: OWNER, url: new URL(`${base}/ueber-mich/`, Astro.site).href, image: new URL(`${base}/img/ricard.jpg`, Astro.site).href, jobTitle: 'Spezialist für Tracking und Google Ads' },
   publisher: { '@type': 'Organization', name: BRAND },
   mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href,
   inLanguage: 'de-DE',
@@ -31,6 +32,22 @@ const schema = {
     <h1>{post.data.title}</h1>
     <div class="post-meta">{OWNER} · {fmt(post.data.date)}{post.data.updated && ` · aktualisiert am ${fmt(post.data.updated)}`}</div>
     <Content />
+    <aside class="author-box">
+      <picture>
+        <source srcset={`${base}/img/ricard-avatar.webp`} type="image/webp" />
+        <img src={`${base}/img/ricard-avatar.jpg`} width="96" height="96" alt={OWNER} loading="lazy" />
+      </picture>
+      <div>
+        <strong>{OWNER}</strong>
+        <p>Spezialist für Tracking und Google Ads. Ich richte für kleine und mittlere Unternehmen in Deutschland, Österreich und der Schweiz Tracking ein, das Conversions sauber misst und erst nach der Einwilligung startet. <a href={`${base}/ueber-mich/`}>Mehr über mich</a></p>
+      </div>
+    </aside>
   </article>
   <CtaBand title="Ihre Website in 30 Sekunden prüfen" text="Der kostenlose Test zeigt, ob Consent Mode v2 greift und ob vor der Einwilligung schon Daten fließen." href="/" label="Kostenlos testen" />
 </Base>
+
+<style>
+  .author-box { display: flex; gap: 18px; align-items: flex-start; margin-top: 40px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+  .author-box img { width: 96px; height: 96px; border-radius: 50%; display: block; flex: none; }
+  .author-box p { margin: 6px 0 0; font-size: 15px; color: var(--muted); }
+</style>
