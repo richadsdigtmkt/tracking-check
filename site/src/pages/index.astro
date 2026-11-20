@@ -4,19 +4,65 @@ import Checker from '../components/Checker.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { isPublished } from '../lib/posts';
 import { getCollection } from 'astro:content';
-import { BRAND, PACKAGES } from '../config';
+import { BRAND, PACKAGES, CONTACT_EMAIL } from '../config';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const posts = (await getCollection('blog', isPublished))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
+const faq = [
+  { q: 'Was prüft der kostenlose Tracking-Check?', a: 'Der Test öffnet Ihre Website wie ein echter Besucher und zeigt in rund 30 Sekunden, ob ein Cookie-Banner erkannt wird, ob Consent Mode v2 Signale an Google sendet, ob Cookies oder Pixel schon vor der Einwilligung starten, welche GA4- und Google-Ads-Conversions eingerichtet sind und ob Ihr Kontaktformular erfasst wird.' },
+  { q: 'Was ist Consent Mode v2 und brauche ich ihn?', a: 'Consent Mode v2 übermittelt Google, ob ein Besucher der Nutzung seiner Daten für Analyse und Werbung zugestimmt hat. Für Besucher aus dem Europäischen Wirtschaftsraum verlangt Google diese Signale. Fehlen sie, gehen Remarketing-Listen und Teile der Conversion-Messung in Google Ads verloren.' },
+  { q: 'Warum zeigt Google Ads weniger Conversions, als Anfragen hereinkommen?', a: 'Häufige Ursachen sind ein Kontaktformular, das gar nicht gemessen wird, fehlende oder falsch verbundene Einwilligungssignale, falsche Conversion-IDs oder Labels und Conversion-Aktionen, die nicht als primär eingestellt sind.' },
+  { q: 'Muss ich meinen Cookie-Banner oder mein Shopsystem wechseln?', a: 'Nein. Die Einrichtung erfolgt mit Ihrem bestehenden Cookie-Banner, zum Beispiel Borlabs Cookie, Cookiebot, Usercentrics, Complianz oder Real Cookie Banner, und mit Systemen wie WordPress, Shopify, Shopware, Wix, TYPO3 oder JTL-Shop.' },
+  { q: 'Was kostet die Einrichtung?', a: 'Sie erhalten nach einer kurzen Prüfung Ihrer Website einen Festpreis, bevor etwas geändert wird. Vor der Aktivierung bekommen Sie einen Bericht zur Freigabe.' },
+  { q: 'Wer steckt hinter Tracking-Check?', a: 'Ricard Rodríguez Parra, Spezialist für Tracking und Google Ads mit Sitz in Barcelona. Er arbeitet für kleine und mittlere Unternehmen in Deutschland, Österreich und der Schweiz, auf Deutsch.' },
+];
+const site = new URL(`${base}/`, Astro.site).href;
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'ProfessionalService',
-  name: BRAND,
-  description: 'Einrichtung und Prüfung von Google Tag Manager, GA4, Google-Ads-Conversions und Consent Mode v2 für kleine und mittlere Unternehmen.',
-  url: new URL(`${base}/`, Astro.site).href,
-  areaServed: ['DE', 'AT', 'CH'],
-  knowsLanguage: ['de', 'en', 'es', 'ca'],
+  '@graph': [
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${site}#service`,
+      name: BRAND,
+      description: 'Kostenloser Online-Test sowie Einrichtung und Prüfung von Google Tag Manager, GA4, Google-Ads-Conversions und Consent Mode v2 für kleine und mittlere Unternehmen.',
+      url: site,
+      email: CONTACT_EMAIL,
+      image: new URL(`${base}/img/ricard.jpg`, Astro.site).href,
+      areaServed: [{ '@type': 'Country', name: 'Deutschland' }, { '@type': 'Country', name: 'Österreich' }, { '@type': 'Country', name: 'Schweiz' }],
+      knowsLanguage: ['de', 'en', 'es', 'ca'],
+      address: { '@type': 'PostalAddress', addressLocality: 'Barcelona', addressCountry: 'ES' },
+      founder: { '@id': `${site}#ricard` },
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Tracking-Leistungen',
+        itemListElement: PACKAGES.map((p) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: p.name, description: p.items.join('; ') } })),
+      },
+    },
+    {
+      '@type': 'Person',
+      '@id': `${site}#ricard`,
+      name: 'Ricard Rodríguez Parra',
+      jobTitle: 'Spezialist für Tracking und Google Ads',
+      url: new URL(`${base}/ueber-mich/`, Astro.site).href,
+      image: new URL(`${base}/img/ricard.jpg`, Astro.site).href,
+      worksFor: { '@type': 'Organization', name: 'RichAds Digital Marketing', url: 'https://richadsdigitalmarketing.com' },
+      sameAs: ['https://richadsdigitalmarketing.com'],
+    },
+    {
+      '@type': 'WebApplication',
+      name: 'Tracking-Check',
+      url: site,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+      description: 'Kostenloser Test für Cookie-Banner, Consent Mode v2, GA4, Google-Ads-Conversions und Formular-Tracking einer Website.',
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    },
+  ],
 };
 ---
 <Base
@@ -65,6 +111,18 @@ const schema = {
     </>
   )}
 
+  <h2>Häufige Fragen</h2>
+  <div class="faq">
+    {faq.map((f) => (<details><summary>{f.q}</summary><p>{f.a}</p></details>))}
+  </div>
+
   <CtaBand />
   <p class="small muted">Der Test ist eine automatische Momentaufnahme der eingegebenen Seite und ersetzt keine Rechtsberatung.</p>
 </Base>
+
+<style>
+  .faq { max-width: 760px; }
+  .faq details { border-bottom: 1px solid var(--line); padding: 14px 0; }
+  .faq summary { cursor: pointer; font-weight: 600; }
+  .faq p { margin: 10px 0 0; color: var(--muted); }
+</style>

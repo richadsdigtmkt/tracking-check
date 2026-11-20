@@ -46,3 +46,15 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+      # Avisa a Bing (y por tanto a ChatGPT y Copilot), Yandex y otros buscadores de IndexNow
+      # de todas las URLs del sitemap, para que se rastreen sin esperar.
+      - name: IndexNow
+        continue-on-error: true
+        run: |
+          sleep 30
+          URLS=$(curl -s "$SITE_URL/sitemap-0.xml" | grep -o '<loc>[^<]*</loc>' | sed 's/<[^>]*>//g' | jq -R . | jq -s .)
+          echo "$URLS"
+          curl -s -o /dev/null -w "IndexNow HTTP %{http_code}\n" -X POST https://api.indexnow.org/indexnow \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            -d "{\"host\":\"tracking-check.de\",\"key\":\"9dee32612c4be708edb2e26f3c38676b\",\"keyLocation\":\"$SITE_URL/9dee32612c4be708edb2e26f3c38676b.txt\",\"urlList\":$URLS}"
+
